@@ -10,13 +10,16 @@
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg"
+    :class="{'navbar-light bg-light': !useDarkNavBar, 'navbar-dark bg-dark': useDarkNavBar}"
+    >
         <div classnav="container-fluid">
             <a class="navbar-brand" href="#">My Vue</a>
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li v-for="(page, index) in pages" class="nav-item" :key="index">
                     <a 
                     class="nav-link" 
+                    :class="{active: activePage == index}"
                     aria-current="page" 
                     v-bind:href="page.link.url"
                     :title="`This link goes to the ${page.link.text} page`"
@@ -24,6 +27,11 @@
                     >{{page.link.text}}</a>
                 </li>
             </ul>
+
+            <form class="d-flex">
+                <button class="btn btn-primary"
+                @click.prevent="useDarkNavBar = !useDarkNavBar">Toggle Navbar</button>
+            </form>
         </div>
     </nav>
 
@@ -38,10 +46,11 @@
             data(){
                 return {
                     activePage: 0,
+                    useDarkNavBar: true,
                     pages: [
                         {
                         link: {text: 'Home', url: 'home.html'},
-                        pageTitle: 'Homepage',
+                        pageTitle: 'Home Page',
                         content: 'This is the home content'
                         },
                         {
