@@ -9,30 +9,13 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
 <body>
-    <nav 
-    :class="[`navbar-${theme}`,`bg-${theme}`, 'navbar', 'navbar-expand-lg']"
-    >
-        <div classnav="container-fluid">
-            <a class="navbar-brand" href="#">My Vue</a>
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li v-for="(page, index) in pages" class="nav-item" :key="index">
-                    <a 
-                    class="nav-link" 
-                    :class="{active: activePage == index}"
-                    aria-current="page" 
-                    v-bind:href="page.link.url"
-                    :title="`This link goes to the ${page.link.text} page`"
-                    @click.prevent="activePage = index"
-                    >{{page.link.text}}</a>
-                </li>
-            </ul>
+    <navbar 
+    :pages="pages"
+    :active-page="activePage"
+    :nav-link-click="(index) => activePage=index"
 
-            <form class="d-flex">
-                <button class="btn btn-primary"
-                @click.prevent="changeTheme()"  >Toggle</button>
-            </form>
-        </div>
-    </nav>
+    ></navbar>
+
 
     <page-viewer :page="pages[activePage]">
         
@@ -41,20 +24,11 @@
     <script>
 
         let app =  Vue.createApp({
-            computed: {
-                navbarClasses(){
-                    return {
-                        'navbar-light': !this.useDarkNavBar, 
-                        'bg-light': !this.useDarkNavBar, 
-                        'navbar-dark': this.useDarkNavBar,
-                        'bg-dark': this.useDarkNavBar,
-                    }
-                }
-            },
+
             data(){
                 return {
                     activePage: 0,
-                    theme: 'light',
+                
                     pages: [
                         {
                         link: {text: 'Home', url: 'home.html'},
@@ -75,15 +49,7 @@
                     
                 };
             },
-            methods: {
-                changeTheme(){
-                    let theme = 'light';
-                    if(this.theme == 'light'){
-                        theme = 'dark';
-                    }
-                    this.theme = theme;
-                }
-            }
+
         });
         app.component('page-viewer', {
             props:['page'],
@@ -94,6 +60,51 @@
             </div>
             `
         });
+
+        app.component('navbar', {
+            props:['pages', 'activePage', 'navLinkClick'],
+            template:`
+            <nav 
+                :class="[\`navbar-\${theme}\`,\`bg-\${theme}\`, 'navbar', 'navbar-expand-lg']"
+                >
+                    <div classnav="container-fluid">
+                        <a class="navbar-brand" href="#">My Vue</a>
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li v-for="(page, index) in pages" class="nav-item" :key="index">
+                                <a 
+                                class="nav-link" 
+                                :class="{active: activePage == index}"
+                                aria-current="page" 
+                                v-bind:href="page.link.url"
+                                :title="\`This link goes to the \${page.link.text} page\`"
+                                @click.prevent="navLinkClick(index)"
+                                >{{page.link.text}}</a>
+                            </li>
+                        </ul>
+
+                        <form class="d-flex">
+                            <button class="btn btn-primary"
+                            @click.prevent="changeTheme()"  >Toggle</button>
+                        </form>
+                    </div>
+                </nav>
+            `,
+            data(){
+                return {
+                    theme:'light',
+                }
+            },
+            methods: {
+                changeTheme(){
+                    let theme = 'light';
+                    if(this.theme == 'light'){
+                        theme = 'dark';
+                    }
+                    this.theme = theme;
+                }
+            }
+
+        })
         
         app.mount('body');
     </script>
